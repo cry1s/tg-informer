@@ -21,15 +21,17 @@ let chads = [
   252155456720470016n,
   320899131533164544n,
   506546769853677572n,
+  309648865370439681n,
 ]
 
 let news_chats = [
   -1001101170442,
+  -1001645717443, // test
 ]
 
 let all_chats = [
   -1001143742161,
-  -1001645717443,
+  -1001758589847, // timur
 ]
 
 let chats = news_chats.concat(all_chats);
@@ -105,7 +107,7 @@ async function playText(text) {
   setTimeout(() => {
     entersState(player, AudioPlayerStatus.Idle, 60000).then(async () => {
       for (let i = 0; i < urls.length; i++) {
-        const url = urls[i];
+        const url = urls[i]; 
         player.play(createAudioResource(url))
         await entersState(player, AudioPlayerStatus.Idle, 60000)
       }
@@ -117,8 +119,6 @@ async function playText(text) {
 bot.once('ready', async () => {
   console.log(`Logged in as ${bot.user.tag}!`);
   await tginit();
-  await setupConnections();
-  playText("РАБОТАЕМ РАБОТАЕМ");
 });
 
 async function setupConnections() {
@@ -141,9 +141,11 @@ async function tginit() {
     if (event['message'].text) {
       let msg = event['message'].text;
       const chatid = event['message'].chatId;
-      if (!(msg.includes("❗️") || msg.includes("⚡️")) && news_chats.includes(chatid)) return;
-      msg = msg.replace("❗️", "").replace("⚡️", "").replace("**", "");
+      if (!(msg.includes("❗️") || msg.includes("⚡️")) && news_chats.includes(+chatid)) return;
       await setupConnections();
+      while (msg.includes("❗️")) msg = msg.replace("❗️", "");
+      while (msg.includes("⚡️")) msg = msg.replace("⚡️", "");
+      while (msg.includes("*")) msg = msg.replace("*", "");
       await playText(msg);
     }
   }, new NewMessage({ chats }))
